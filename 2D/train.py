@@ -126,6 +126,11 @@ if __name__ == "__main__":
 
     model_filename, model_callbacks = unet_model.get_callbacks()
 
+    # visualize the model
+    import visualkeras
+    visual_filename = os.path.join(args.output_path,'model_visualization.png')
+    visualkeras.layered_view(model, to_file=visual_filename)
+
     """
     Step 3: Train the model on the data
     """
