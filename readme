@@ -6,6 +6,7 @@ http://medicaldecathlon.com/ -> get data -> https://drive.google.com/drive/folde
 
 # install
 virtualenv --python=python3.7 venv3.7
+go inside venv:
 pip install tensorflow==2.2.0 tqdm psutil nibabel
 pip install visualkeras # parisa added: for visualization
 pip install protobuf==3.20.* # parisa added: to avoid error
@@ -17,6 +18,8 @@ python -m ipykernel install --user --name=venv3.7
 jupyter notebook -> kernel -> choose kernel
 
 # run the training
+cd 2D
+mkdir output
 python train.py --data_path /home/pkhateri/Documents/data/decathlon/Task01_BrainTumour
 
 # run the inference (test)
