@@ -1,0 +1,23 @@
+# github repo
+https://github.com/IntelAI/unet
+
+# data from
+http://medicaldecathlon.com/ -> get data -> https://drive.google.com/drive/folders/1HqEgzS8BV2c7xYNrZdEAnrHk7osJJ--2 -> Task01_BrainTumour.tar -> un-tarr -> save in Documents/data/decathlon
+
+# install
+virtualenv --python=python3.7 venv3.7
+pip install tensorflow==2.2.0 tqdm psutil nibabel
+pip install visualkeras # parisa added: for visualization
+pip install protobuf==3.20.* # parisa added: to avoid error
+
+# jupyter notebook in venv
+go inside the venv: source venv3.7/bin/activate
+pip install ipykernel
+python -m ipykernel install --user --name=venv3.7 
+jupyter notebook -> kernel -> choose kernel
+
+# run the training
+python train.py --data_path /home/pkhateri/Documents/data/decathlon/Task01_BrainTumour
+
+# run the inference (test)
+python plot_tf_inference_examples.py --data_path /home/pkhateri/Documents/data/decathlon/Task01_BrainTumour --output_path ./output
