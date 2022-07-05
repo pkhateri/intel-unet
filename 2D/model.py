@@ -335,7 +335,8 @@ class unet(object):
 
         tensorboard_checkpoint = K.callbacks.TensorBoard(
             log_dir=tensorboard_filename,
-            write_graph=True, write_images=True)
+            write_graph=True, write_images=True,
+            histogram_freq = 1, profile_batch = '1,20') # for profiling
 
         early_stopping = K.callbacks.EarlyStopping(patience=5, restore_best_weights=True)
 
