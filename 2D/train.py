@@ -66,13 +66,14 @@ def test_intel_tensorflow():
     print("We are using Tensorflow version {}".format(tf.__version__))
 
     major_version = int(tf.__version__.split(".")[0])
-    if major_version >= 2:
-        from tensorflow.python import _pywrap_util_port
-        print("Intel-optimizations (DNNL) enabled:",
-              _pywrap_util_port.IsMklEnabled())
-    else:
-        print("Intel-optimizations (DNNL) enabled:",
-              tf.pywrap_tensorflow.IsMklEnabled())
+    # comment these lines out, as they are not compatible for newer versions of tensorflow.
+    #if major_version >= 2:
+    #    from tensorflow.python import _pywrap_util_port
+    #    print("Intel-optimizations (DNNL) enabled:",
+    #          _pywrap_util_port.IsMklEnabled())
+    #else:
+    #    print("Intel-optimizations (DNNL) enabled:",
+    #          tf.pywrap_tensorflow.IsMklEnabled())
 
 if __name__ == "__main__":
 

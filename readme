@@ -10,6 +10,17 @@ go inside venv:
 pip install tensorflow==2.2.0 tqdm psutil nibabel
 pip install visualkeras # parisa added: for visualization
 pip install protobuf==3.20.* # parisa added: to avoid error
+pip install -U tensorboard_plugin_profile # for profiling
+
+# install on vm-manager & with gpu
+- vm-manager has python 3.8 only:
+virtualenv --python=python3.8 venv3.8
+- go inside venv:
+- I had to change tensorflow version to a higher version so that it is compatible with the current cuda and cuDNN
+pip install tensorflow-gpu tqdm psutil nibabel
+pip install visualkeras # parisa added: for visualization
+pip install protobuf # parisa added: to avoid error
+
 
 # jupyter notebook in venv
 go inside the venv: source venv3.7/bin/activate
