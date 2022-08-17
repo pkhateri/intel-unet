@@ -30,7 +30,7 @@ import time
 from tensorflow import keras as K
 import settings
 import argparse
-from dataloader import DatasetGenerator, get_decathlon_filelist
+from dataloader_oct_png import DatasetGenerator, get_oct_filelist
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -148,7 +148,7 @@ if __name__ == "__main__":
 
     model_filename = os.path.join(args.output_path, args.inference_filename)
 
-    trainFiles, validateFiles, testFiles = get_decathlon_filelist(data_path=args.data_path, seed=args.seed, split=args.split)
+    trainFiles, validateFiles, testFiles = get_oct_filelist(data_path=args.data_path, seed=args.seed, split=args.split)
 
     ds_test = DatasetGenerator(testFiles, batch_size=128, crop_dim=[args.crop_dim,args.crop_dim], augment=False, seed=args.seed)
 

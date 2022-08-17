@@ -30,7 +30,7 @@ import os
 import tensorflow as tf  # conda install -c anaconda tensorflow
 import settings   # Use the custom settings.py file for default parameters
 
-from dataloader import DatasetGenerator, get_decathlon_filelist
+from dataloader_oct_png import DatasetGenerator, get_oct_filelist
 
 import numpy as np
 
@@ -91,10 +91,10 @@ if __name__ == "__main__":
     Step 1: Define a data loader
     """
     print("-" * 30)
-    print("Loading the data from the Medical Decathlon directory to a TensorFlow data loader ...")
+    print("Loading the data from the OCT png image directory to a TensorFlow data loader ...")
     print("-" * 30)
 
-    trainFiles, validateFiles, testFiles = get_decathlon_filelist(data_path=args.data_path, seed=args.seed, split=args.split)
+    trainFiles, validateFiles, testFiles = get_oct_filelist(data_path=args.data_path, seed=args.seed, split=args.split)
 
     ds_train = DatasetGenerator(trainFiles, batch_size=args.batch_size, crop_dim=[args.crop_dim,args.crop_dim], augment=True, seed=args.seed)
     ds_validation = DatasetGenerator(validateFiles, batch_size=args.batch_size, crop_dim=[args.crop_dim,args.crop_dim], augment=False, seed=args.seed)
