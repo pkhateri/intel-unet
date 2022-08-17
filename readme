@@ -8,6 +8,7 @@ http://medicaldecathlon.com/ -> get data -> https://drive.google.com/drive/folde
 virtualenv --python=python3.7 venv3.7
 go inside venv:
 pip install tensorflow==2.2.0 tqdm psutil nibabel
+pip install matplotlib # parisa added: for drawing plot
 pip install visualkeras # parisa added: for visualization
 pip install protobuf==3.20.* # parisa added: to avoid error
 pip install -U tensorboard_plugin_profile # for profiling
