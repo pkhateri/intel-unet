@@ -117,14 +117,16 @@ def plot_results(ds, batch_num, png_directory):
 
     img, msk = next(ds.ds)
 
-    idx = np.argmax(np.sum(np.sum(msk[:,:,:,0], axis=1), axis=1)) # find the slice with the largest tumor
-
+    # TODO to be decided
+    #idx = np.argmax(np.sum(np.sum(msk[:,:,:,0], axis=1), axis=1)) # find the slice with the largest tumor
+    idx = np.random.randint(0, args.batch_size-1) # randomly find a slice in the current batch
+    
     plt.subplot(1, 3, 1)
-    plt.imshow(img[idx, :, :, 0], cmap="bone", origin="lower")
-    plt.title("MRI {}".format(idx), fontsize=20)
+    plt.imshow(img[idx, :, :, 0], cmap="bone") #, origin="upper") # comment "lower to avoid inverting
+    plt.title("Image", fontsize=20)
 
     plt.subplot(1, 3, 2)
-    plt.imshow(msk[idx, :, :], cmap="bone", origin="lower")
+    plt.imshow(msk[idx, :, :], cmap="bone") #, origin="lower")
     plt.title("Ground truth", fontsize=20)
 
     plt.subplot(1, 3, 3)
@@ -136,7 +138,7 @@ def plot_results(ds, batch_num, png_directory):
     prediction = model.predict(img[[idx]])
     print("Elapsed time = {:.4f} msecs, ".format(1000.0*(time.time()-start_time)), end="")
     
-    plt.imshow(prediction[0,:,:,0], cmap="bone", origin="lower")
+    plt.imshow(prediction[0,:,:,0], cmap="bone") #, origin="lower")
     dice_coef = calc_dice(msk[idx], prediction)
     print("Dice coefficient = {:.4f}, ".format(dice_coef), end="")
     plt.title("Prediction\nDice = {:.4f}".format(dice_coef), fontsize=20)
