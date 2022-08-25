@@ -173,3 +173,20 @@ if __name__ == "__main__":
 
     for batchnum in range(10):
         plot_results(ds_test, batchnum, png_directory)
+        
+    #------------------------------------------------------#
+    #  calculate average dice over the whole test dataset  #
+    #------------------------------------------------------#
+    ds_test_all = DatasetGenerator(testFiles, batch_size=len(testFiles), #read all at one batch
+                                    crop_dim=[args.crop_dim,args.crop_dim], augment=False, seed=args.seed)
+    dice_ave=0
+    images, masks = next(ds_test_all.ds) # this is one batch which currently is the whole test data 
+    #TODO crop the data?    
+    for i in range(len(images)):
+        img, msk = images[i,:,:,0], masks[i,:,:,0]
+        pred = model.predict(images[[i]])[0,:,:,0]
+        dice_ave+=calc_dice(msk,pred)
+
+    dice_ave=np.sum(dice_ave)/float(len(images))
+    
+    print("dice_ave:", dice_ave)
