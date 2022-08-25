@@ -36,6 +36,8 @@ parser.add_argument("--output_path", default=settings.OUT_PATH,
                     help="the folder to save the model and checkpoints")
 parser.add_argument("--inference_filename", default=settings.INFERENCE_FILENAME,
                     help="the Keras inference model filename")
+parser.add_argument("--model_name", default=settings.MODEL_NAME,
+                    help="choose the model: unet, deep_unet")
 parser.add_argument("--use_upsampling",
                     help="use upsampling instead of transposed convolution",
                     action="store_true", default=settings.USE_UPSAMPLING)
@@ -59,6 +61,8 @@ parser.add_argument("--blocktime", type=int,
 parser.add_argument("--epochs", type=int,
                     default=settings.EPOCHS,
                     help="number of epochs to train")
+parser.add_argument("--optimizer_name", default=settings.OPTIMIZER_NAME,
+                    help="name of the optimizer")
 parser.add_argument("--learningrate", type=float,
                     default=settings.LEARNING_RATE,
                     help="learningrate")

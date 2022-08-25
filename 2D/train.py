@@ -116,6 +116,8 @@ if __name__ == "__main__":
                  fms=args.featuremaps,
                  output_path=args.output_path,
                  inference_filename=args.inference_filename,
+                 model_name=args.model_name,
+                 optimizer_name=args.optimizer_name,
                  learning_rate=args.learningrate,
                  weight_dice_loss=args.weight_dice_loss,
                  use_upsampling=args.use_upsampling,
@@ -123,14 +125,9 @@ if __name__ == "__main__":
                  print_model=args.print_model)
 
     model = unet_model.create_model(
-        ds_train.get_input_shape(), ds_train.get_output_shape())
+        ds_train.get_input_shape(), ds_train.get_output_shape(), model_name=args.model_name)
 
     model_filename, model_callbacks = unet_model.get_callbacks()
-
-    # visualize the model
-    import visualkeras
-    visual_filename = os.path.join(args.output_path,'model_visualization.png')
-    visualkeras.layered_view(model, to_file=visual_filename)
 
     """
     Step 3: Train the model on the data

@@ -20,9 +20,9 @@
 import psutil
 import os
 
-DATA_PATH=os.path.join("/data/medical_decathlon/Task01_BrainTumour")
+DATA_PATH=os.path.join("/home/pkhateri/Documents/data/zoltan/manual_annotation/merged/png/")
 OUT_PATH = os.path.join("./output/")
-INFERENCE_FILENAME = "2d_unet_decathlon"
+INFERENCE_FILENAME = "test" #"2d_unet_decathlon"
 
 EPOCHS = 30  # Number of epochs to train
 
@@ -37,7 +37,13 @@ enough memory, it is easiest just to select a sufficiently
 large batch size to make sure we have a few slices with
 tumors in each batch.
 """
-BATCH_SIZE = 128
+BATCH_SIZE = 20
+
+# which model
+MODEL_NAME= "deep_unet" # unet or deep_unet
+
+# Which optimizer
+OPTIMIZER_NAME = "SGD" # Adam or "SGD"
 
 # Using Adam optimizer
 LEARNING_RATE = 0.0001  # 0.00005
@@ -58,7 +64,7 @@ NUM_INTER_THREADS = 1
 import multiprocessing
 NUM_INTRA_THREADS = min(len(psutil.Process().cpu_affinity()), psutil.cpu_count(logical=False))
 
-CROP_DIM=128  # Crop height and width to this size
+CROP_DIM=-1  # Crop height and width to this size
 SEED=816      # Random seed
 TRAIN_TEST_SPLIT=0.80 # The train/test split
 

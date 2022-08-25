@@ -41,8 +41,10 @@ class unet(object):
                  fms=settings.FEATURE_MAPS,
                  output_path=settings.OUT_PATH,
                  inference_filename=settings.INFERENCE_FILENAME,
+                 model_name=settings.MODEL_NAME,
                  blocktime=settings.BLOCKTIME,
                  num_threads=settings.NUM_INTRA_THREADS,
+                 optimizer_name=settings.OPTIMIZER_NAME,
                  learning_rate=settings.LEARNING_RATE,
                  weight_dice_loss=settings.WEIGHT_DICE_LOSS,
                  num_inter_threads=settings.NUM_INTRA_THREADS,
@@ -75,13 +77,18 @@ class unet(object):
 
         self.output_path = output_path
         self.inference_filename = inference_filename
+        
+        self.model_name = model_name
 
         self.metrics = [self.dice_coef, self.soft_dice_coef]
 
         self.loss = self.dice_coef_loss
         #self.loss = self.combined_dice_ce_loss
-
-        self.optimizer = K.optimizers.Adam(lr=self.learningrate)
+        
+        if optimizer_name=="Adam":
+            self.optimizer = K.optimizers.Adam(lr=self.learningrate)
+        elif optimizer_name=="SGD":
+            self.optimizer = K.optimizers.SGD(lr=self.learningrate)
 
         self.custom_objects = {
             "combined_dice_ce_loss": self.combined_dice_ce_loss,
@@ -183,7 +190,7 @@ class unet(object):
 
         self.num_input_channels = num_chan_in
 
-        inputs = K.layers.Input(self.input_shape, name="MRImages")
+        inputs = K.layers.Input(self.input_shape, name="InputImages")
 
         # Convolution parameters
         params = dict(kernel_size=(3, 3), activation="relu",
@@ -234,6 +241,179 @@ class unet(object):
         else:
             up = K.layers.Conv2DTranspose(name="transconvE", filters=self.fms*8,
                                           **params_trans)(encodeE)
+        concatD = K.layers.concatenate(
+            [up, encodeD], axis=self.concat_axis, name="concatD")
+
+        decodeC = K.layers.Conv2D(
+            name="decodeCa", filters=self.fms*8, **params)(concatD)
+        decodeC = K.layers.Conv2D(
+            name="decodeCb", filters=self.fms*8, **params)(decodeC)
+
+        if self.use_upsampling:
+            up = K.layers.UpSampling2D(name="upC", size=(2, 2))(decodeC)
+        else:
+            up = K.layers.Conv2DTranspose(name="transconvC", filters=self.fms*4,
+                                          **params_trans)(decodeC)
+        concatC = K.layers.concatenate(
+            [up, encodeC], axis=self.concat_axis, name="concatC")
+
+        decodeB = K.layers.Conv2D(
+            name="decodeBa", filters=self.fms*4, **params)(concatC)
+        decodeB = K.layers.Conv2D(
+            name="decodeBb", filters=self.fms*4, **params)(decodeB)
+
+        if self.use_upsampling:
+            up = K.layers.UpSampling2D(name="upB", size=(2, 2))(decodeB)
+        else:
+            up = K.layers.Conv2DTranspose(name="transconvB", filters=self.fms*2,
+                                          **params_trans)(decodeB)
+        concatB = K.layers.concatenate(
+            [up, encodeB], axis=self.concat_axis, name="concatB")
+
+        decodeA = K.layers.Conv2D(
+            name="decodeAa", filters=self.fms*2, **params)(concatB)
+        decodeA = K.layers.Conv2D(
+            name="decodeAb", filters=self.fms*2, **params)(decodeA)
+
+        if self.use_upsampling:
+            up = K.layers.UpSampling2D(name="upA", size=(2, 2))(decodeA)
+        else:
+            up = K.layers.Conv2DTranspose(name="transconvA", filters=self.fms,
+                                          **params_trans)(decodeA)
+        concatA = K.layers.concatenate(
+            [up, encodeA], axis=self.concat_axis, name="concatA")
+
+        convOut = K.layers.Conv2D(
+            name="convOuta", filters=self.fms, **params)(concatA)
+        convOut = K.layers.Conv2D(
+            name="convOutb", filters=self.fms, **params)(convOut)
+
+        prediction = K.layers.Conv2D(name="PredictionMask",
+                                     filters=num_chan_out, kernel_size=(1, 1),
+                                     activation="sigmoid")(convOut)
+
+        model = K.models.Model(inputs=[inputs], outputs=[
+                               prediction], name="2DUNet_Brats_Decathlon")
+
+        optimizer = self.optimizer
+
+        if final:
+            model.trainable = False
+        else:
+
+            model.compile(optimizer=optimizer,
+                          loss=self.loss,
+                          metrics=self.metrics)
+
+            if self.print_model:
+                model.summary()
+
+        return model
+
+    def deep_unet_model(self, imgs_shape, msks_shape,
+                   dropout=0.2,
+                   final=False):
+        """
+        Deep U-Net Model
+        ===========
+        This has 28 layers. The normal unet has 23 layers.
+        """
+
+        if not final:
+            if self.use_upsampling:
+                print("Using UpSampling2D")
+            else:
+                print("Using Transposed Convolution")
+
+        num_chan_in = imgs_shape[self.concat_axis]
+        num_chan_out = msks_shape[self.concat_axis]
+
+        # You can make the network work on variable input height and width
+        # if you pass None as the height and width
+#        if self.channels_first:
+#            self.input_shape = [num_chan_in, None, None]
+#        else:
+#            self.input_shape = [None, None, num_chan_in]
+
+        self.input_shape = imgs_shape
+
+        self.num_input_channels = num_chan_in
+
+        inputs = K.layers.Input(self.input_shape, name="InputImages")
+
+        # Convolution parameters
+        params = dict(kernel_size=(3, 3), activation="relu",
+                      padding="same",
+                      kernel_initializer="he_uniform")
+
+        # Transposed convolution parameters
+        params_trans = dict(kernel_size=(2, 2), strides=(2, 2),
+                            padding="same")
+
+        encodeA = K.layers.Conv2D(
+            name="encodeAa", filters=self.fms, **params)(inputs)
+        encodeA = K.layers.Conv2D(
+            name="encodeAb", filters=self.fms, **params)(encodeA)
+        poolA = K.layers.MaxPooling2D(name="poolA", pool_size=(2, 2))(encodeA)
+
+        encodeB = K.layers.Conv2D(
+            name="encodeBa", filters=self.fms*2, **params)(poolA)
+        encodeB = K.layers.Conv2D(
+            name="encodeBb", filters=self.fms*2, **params)(encodeB)
+        poolB = K.layers.MaxPooling2D(name="poolB", pool_size=(2, 2))(encodeB)
+
+        encodeC = K.layers.Conv2D(
+            name="encodeCa", filters=self.fms*4, **params)(poolB)
+        if self.use_dropout:
+            encodeC = K.layers.SpatialDropout2D(dropout)(encodeC)
+        encodeC = K.layers.Conv2D(
+            name="encodeCb", filters=self.fms*4, **params)(encodeC)
+
+        poolC = K.layers.MaxPooling2D(name="poolC", pool_size=(2, 2))(encodeC)
+
+        encodeD = K.layers.Conv2D(
+            name="encodeDa", filters=self.fms*8, **params)(poolC)
+        if self.use_dropout:
+            encodeD = K.layers.SpatialDropout2D(dropout)(encodeD)
+        encodeD = K.layers.Conv2D(
+            name="encodeDb", filters=self.fms*8, **params)(encodeD)
+
+        poolD = K.layers.MaxPooling2D(name="poolD", pool_size=(2, 2))(encodeD)
+
+        encodeE = K.layers.Conv2D(
+            name="encodeEa", filters=self.fms*16, **params)(poolD)
+        if self.use_dropout:
+            encodeE = K.layers.SpatialDropout2D(dropout)(encodeE)
+
+        encodeE = K.layers.Conv2D(
+            name="encodeEb", filters=self.fms*16, **params)(encodeE)
+        
+        poolE = K.layers.MaxPooling2D(name="poolE", pool_size=(2, 2))(encodeE)
+
+        encodeF = K.layers.Conv2D(
+            name="encodeFa", filters=self.fms*32, **params)(poolE)
+        encodeF = K.layers.Conv2D(
+            name="encodeFb", filters=self.fms*32, **params)(encodeF)
+        
+        if self.use_upsampling:
+            up = K.layers.UpSampling2D(name="upF", size=(2, 2))(encodeF)
+        else:
+            up = K.layers.Conv2DTranspose(name="transconvF", filters=self.fms*8,
+                                          **params_trans)(encodeF)
+        concatE = K.layers.concatenate(
+            [up, encodeE], axis=self.concat_axis, name="concatE")
+        
+        decodeD = K.layers.Conv2D(
+            name="decodeDa", filters=self.fms*16, **params)(concatE)
+        decodeD = K.layers.Conv2D(
+            name="decodeDb", filters=self.fms*16, **params)(decodeD)
+        
+        if self.use_upsampling:
+            up = K.layers.UpSampling2D(name="upD", size=(2, 2))(decodeD)
+        else:
+            up = K.layers.Conv2DTranspose(name="transconvD", filters=self.fms*4,
+                                          **params_trans)(decodeD)
+                
         concatD = K.layers.concatenate(
             [up, encodeD], axis=self.concat_axis, name="concatD")
 
@@ -361,11 +541,17 @@ class unet(object):
 
     def create_model(self, imgs_shape, msks_shape,
                      dropout=0.2,
-                     final=False):
+                     final=False,
+                     model_name="unet"):
         """
         If you have other models, you can try them here
         """
-        return self.unet_model(imgs_shape, msks_shape,
+        if model_name == "unet":
+            return self.unet_model(imgs_shape, msks_shape,
+                               dropout=dropout,
+                               final=final)
+        elif model_name == "deep_unet":
+            return self.deep_unet_model(imgs_shape, msks_shape,
                                dropout=dropout,
                                final=final)
 
