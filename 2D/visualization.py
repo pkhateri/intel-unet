@@ -6,14 +6,14 @@ This module creates a TensorFlow/Keras model
 from model.py and then saves its visualization into a file.
 """
 import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"  # Get rid of the AVX, SSE warnings
+
 import tensorflow as tf 
 from dataloader_oct_png import DatasetGenerator, get_oct_filelist
 
 #import numpy as np
 
 from argparser_visualization import args
-
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"  # Get rid of the AVX, SSE warnings
 
 # If hyperthreading is enabled, then use
 os.environ["KMP_AFFINITY"] = "granularity=thread,compact,1,0"

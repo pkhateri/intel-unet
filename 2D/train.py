@@ -26,6 +26,7 @@ best model.
 
 import datetime
 import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"  # Get rid of the AVX, SSE warnings
 
 import tensorflow as tf  # conda install -c anaconda tensorflow
 import settings   # Use the custom settings.py file for default parameters
@@ -42,7 +43,6 @@ to take advantage of multi-core systems.
 See https://github.com/intel/mkl-dnn
 """
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"  # Get rid of the AVX, SSE warnings
 
 # If hyperthreading is enabled, then use
 os.environ["KMP_AFFINITY"] = "granularity=thread,compact,1,0"
