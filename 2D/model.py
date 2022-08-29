@@ -88,7 +88,7 @@ class unet(object):
         if optimizer_name=="Adam":
             self.optimizer = K.optimizers.Adam(lr=self.learningrate)
         elif optimizer_name=="SGD":
-            self.optimizer = K.optimizers.SGD(lr=self.learningrate)
+            self.optimizer = K.optimizers.SGD(lr=self.learningrate, momentum=0.9)
 
         self.custom_objects = {
             "combined_dice_ce_loss": self.combined_dice_ce_loss,
@@ -505,11 +505,11 @@ class unet(object):
 
         # Tensorboard callbacks
         if (self.use_upsampling):
-            tensorboard_filename = os.path.join(self.output_path,
+            tensorboard_filename = os.path.join(self.output_path, self.inference_filename,
                                                 "keras_tensorboard_upsampling/{}".format(
                                                     directoryName))
         else:
-            tensorboard_filename = os.path.join(self.output_path,
+            tensorboard_filename = os.path.join(self.output_path, self.inference_filename, 
                                                 "keras_tensorboard_transposed/{}".format(
                                                     directoryName))
 
