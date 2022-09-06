@@ -518,9 +518,13 @@ class unet(object):
             write_graph=True, write_images=True,
             histogram_freq = 1, profile_batch = '1,20') # for profiling
 
-        early_stopping = K.callbacks.EarlyStopping(patience=5, restore_best_weights=True)
+        # history logger
+        log_filename = os.path.join(model_filename, 'history_log.csv')
+        history_logger=tf.keras.callbacks.CSVLogger(log_filename, separator=" ", append=True)
+        
+        early_stopping = K.callbacks.EarlyStopping(patience=12, restore_best_weights=True)
 
-        return model_filename, [model_checkpoint, early_stopping, tensorboard_checkpoint]
+        return model_filename, [model_checkpoint, early_stopping, tensorboard_checkpoint, history_logger]
 
     def evaluate_model(self, model_filename, ds_test):
         """
