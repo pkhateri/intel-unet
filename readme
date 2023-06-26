@@ -45,5 +45,6 @@ python train.py --data_path /home/pkhateri/Documents/data/decathlon/Task01_Brain
 python plot_tf_inference_examples.py --data_path /home/pkhateri/Documents/data/decathlon/Task01_BrainTumour --output_path ./output
 
 # run the tensorboard 
-tensorboard --logdir 2D/output/keras_tensorboard_transposed/unet_block0_inter4_intra4/
-
+tensorboard --logdir 2D/output/output_dir/keras_tensorboard_transposed/unet_block0_inter4_intra4/
+- specify the port if run on remote:
+tensorboard --logdir 2D/output/output_dir/keras_tensorboard_transposed/unet_block0_inter4_intra4/ --port 6006
