@@ -37,12 +37,13 @@ python -m ipykernel install --user --name=venv3.7
 jupyter notebook -> kernel -> choose kernel
 
 # run the training
-cd 2D
-mkdir output
-python train.py --data_path /home/pkhateri/Documents/data/decathlon/Task01_BrainTumour
+`cd 2D`
+`mkdir output/output_dir`
+modify setting.py for input paramaters
+`python train.py`
 
 # run the inference (test)
-python plot_tf_inference_examples.py --data_path /home/pkhateri/Documents/data/decathlon/Task01_BrainTumour --output_path ./output
+`python plot_tf_inference_examples.py`
 
 # run the tensorboard 
 tensorboard --logdir 2D/output/output_dir/keras_tensorboard_transposed/unet_block0_inter4_intra4/

@@ -2,7 +2,7 @@
 2D/output/*
 2D/inference_examples/*
 2D/inference_examples_openvino/*
-
+*/*.sif
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
