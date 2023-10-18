@@ -90,7 +90,7 @@ parser.add_argument("--use_augmentation",
                     help="use data augmentation on training images",
                     action="store_true")
 parser.add_argument("--output_pngs",
-                    default="inference_examples",
+                    default=settings.OUTPUT_PNGS,
                     help="the directory for the output prediction pngs")
 parser.add_argument("--input_filename",
                     help="Name of saved TensorFlow model directory",

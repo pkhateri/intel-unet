@@ -50,7 +50,7 @@ parser.add_argument("--inference_filename", default=settings.INFERENCE_FILENAME,
 parser.add_argument("--use_pconv",help="use partial convolution based padding",
                     action="store_true",
                     default=settings.USE_PCONV)
-parser.add_argument("--output_pngs", default="inference_examples",
+parser.add_argument("--output_pngs", default=settings.OUTPUT_PNGS,
                     help="the directory for the output prediction pngs")
 
 parser.add_argument("--intraop_threads", default=settings.NUM_INTRA_THREADS,

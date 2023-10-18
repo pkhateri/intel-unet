@@ -20,11 +20,12 @@
 import psutil
 import os
 
-DATA_PATH=os.path.join("/home/pkhateri/Documents/data/zoltan/manual_annotation/merged/png/")
+DATA_PATH=os.path.join("/projects/parisa/data/zoltan/manual_annotation/merged/png/")
 OUT_PATH = os.path.join("./output/")
-INFERENCE_FILENAME = "test" #"2d_unet_decathlon"
+INFERENCE_FILENAME = "test"
+OUTPUT_PNGS = os.path.join("inference_examples", INFERENCE_FILENAME)
 
-EPOCHS = 30  # Number of epochs to train
+EPOCHS = 100  # Number of epochs to train
 
 """
 If the batch size is too small, then training is unstable.
@@ -40,10 +41,10 @@ tumors in each batch.
 BATCH_SIZE = 20
 
 # which model
-MODEL_NAME= "deep_unet" # unet or deep_unet
+MODEL_NAME= "unet" # unet or deep_unet
 
 # Which optimizer
-OPTIMIZER_NAME = "SGD" # Adam or "SGD"
+OPTIMIZER_NAME = "Adam" # Adam or "SGD"
 
 # Using Adam optimizer
 LEARNING_RATE = 0.0001  # 0.00005

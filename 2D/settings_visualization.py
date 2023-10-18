@@ -20,9 +20,10 @@
 import psutil
 import os
 
-DATA_PATH=os.path.join("/home/pkhateri/Documents/data/zoltan/manual_annotation/merged/png/")
+DATA_PATH=os.path.join("/projects/parisa/data/zoltan/manual_annotation/merged/png/")
 OUT_PATH = os.path.join("./output/")
 INFERENCE_FILENAME = "visualization" #"2d_unet_decathlon"
+OUTPUT_PNGS = os.path.join("inference_examples", INFERENCE_FILENAME)
 
 EPOCHS = 30  # Number of epochs to train
 
@@ -40,7 +41,7 @@ tumors in each batch.
 BATCH_SIZE = 20
 
 # which model
-MODEL_NAME= "deep_unet" # unet or deep_unet
+MODEL_NAME= "unet" # unet or deep_unet
 
 # Which optimizer
 OPTIMIZER_NAME = "SGD" # Adam or "SGD"
@@ -74,7 +75,7 @@ USE_AUGMENTATION = True  # Use data augmentation during training
 USE_DROPOUT = True  # Use spatial dropout in model
 USE_PCONV = False  # If True, Partial Convolution based padding will be used. See https://arxiv.org/pdf/1811.11718.pdf
 
-FONT_FILE = "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf"
+FONT_FILE = "/projects/parisa/LiberationMono-Regular.ttf"
 FONT_SIZE = 24
 
 INPUT_COLOR="teal"
