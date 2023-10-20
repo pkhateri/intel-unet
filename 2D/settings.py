@@ -20,10 +20,12 @@
 import psutil
 import os
 
-DATA_PATH=os.path.join("/projects/parisa/data/zoltan/manual_annotation/merged/png/")
+DATA_PATH = os.path.join("/projects/parisa/data/zoltan/manual_annotation/merged/png/")
+#DATA_PATH = os.path.join('/projects/parisa/data/decathlon/Task01_BrainTumour/')
 OUT_PATH = os.path.join("./output/")
 INFERENCE_FILENAME = "test"
 OUTPUT_PNGS = os.path.join("inference_examples", INFERENCE_FILENAME)
+INPUT_TYPE = 'oct_png' # oct_png or decathlon
 
 EPOCHS = 100  # Number of epochs to train
 

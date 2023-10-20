@@ -95,6 +95,9 @@ parser.add_argument("--output_pngs",
 parser.add_argument("--input_filename",
                     help="Name of saved TensorFlow model directory",
                     default=os.path.join(settings.OUT_PATH,settings.INFERENCE_FILENAME))
+parser.add_argument("--input_type",
+                    default=settings.INPUT_TYPE,
+                    help="input image type: oct_png or decathlon")
 
 args = parser.parse_args()
 

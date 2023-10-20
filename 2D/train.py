@@ -31,8 +31,6 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"  # Get rid of the AVX, SSE warnings
 import tensorflow as tf  # conda install -c anaconda tensorflow
 import settings   # Use the custom settings.py file for default parameters
 
-from dataloader_oct_png import DatasetGenerator, get_oct_filelist
-
 import numpy as np
 
 from argparser import args
@@ -94,7 +92,12 @@ if __name__ == "__main__":
     print("Loading the data from the OCT png image directory to a TensorFlow data loader ...")
     print("-" * 30)
 
-    trainFiles, validateFiles, testFiles = get_oct_filelist(data_path=args.data_path, seed=args.seed, split=args.split)
+    if args.input_type=='oct_png':
+        from dataloader_oct_png import DatasetGenerator, get_oct_filelist
+        trainFiles, validateFiles, testFiles = get_oct_filelist(data_path=args.data_path, seed=args.seed, split=args.split)
+    elif args.input_type=='decathlon':
+        from dataloader import DatasetGenerator, get_decathlon_filelist
+        trainFiles, validateFiles, testFiles = get_decathlon_filelist(data_path=args.data_path, seed=args.seed, split=args.split)
 
     ds_train = DatasetGenerator(trainFiles, batch_size=args.batch_size, crop_dim=[args.crop_dim,args.crop_dim], augment=args.use_augmentation, seed=args.seed)
     ds_validation = DatasetGenerator(validateFiles, batch_size=args.batch_size, crop_dim=[args.crop_dim,args.crop_dim], augment=False, seed=args.seed)

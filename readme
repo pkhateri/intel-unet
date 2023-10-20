@@ -26,7 +26,7 @@ pip install protobuf # parisa added: to avoid error
 - go to the singularity recipe folder
 - singularity build --fakeroot intel-unet-prerequisites-22.06-tf2-py3.sif intel-unet-prerequisites-22.06-tf2-py3.def
 ## run the container
-- singularity run --nv --bind /projects /projects/parisa/container/intel_unet/intel-unet-prerequisites-22.06-tf2-py3.sif
+- singularity run --nv --bind /projects /projects/parisa/git_software/intel-unet/singularity/intel-unet-prerequisites-20.08-tf2-py3.sif
 ## ready to go
 
 
