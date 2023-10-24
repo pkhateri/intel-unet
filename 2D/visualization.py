@@ -8,8 +8,8 @@ from model.py and then saves its visualization into a file.
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"  # Get rid of the AVX, SSE warnings
 
-import tensorflow as tf 
-from dataloader_oct_png import DatasetGenerator, get_oct_filelist
+import tensorflow as tf
+from dataloader_2d import DatasetGenerator, get_2d_filelist
 
 #import numpy as np
 
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     print("Loading the data from the OCT png image directory to a TensorFlow data loader ...")
     print("-" * 30)
 
-    trainFiles, validateFiles, testFiles = get_oct_filelist(data_path=args.data_path, seed=args.seed, split=args.split)
+    trainFiles, validateFiles, testFiles = get_2d_filelist(data_path=args.data_path, seed=args.seed, split=args.split)
 
     ds_train = DatasetGenerator(trainFiles, batch_size=args.batch_size, crop_dim=[args.crop_dim,args.crop_dim], augment=True, seed=args.seed)
     ds_validation = DatasetGenerator(validateFiles, batch_size=args.batch_size, crop_dim=[args.crop_dim,args.crop_dim], augment=False, seed=args.seed)
@@ -105,8 +105,8 @@ if __name__ == "__main__":
     from collections import defaultdict
     from tensorflow.python.keras.layers import Input, Dense, Conv2D, Flatten, Dropout, MaxPooling2D, ZeroPadding2D, concatenate, SpatialDropout2D, Conv2DTranspose
     from PIL import ImageFont
-    
-    font = ImageFont.truetype(args.font_file, args.font_size) 
+
+    font = ImageFont.truetype(args.font_file, args.font_size)
     color_map = defaultdict(dict)
     color_map[Input]['fill'] = args.input_color
     color_map[Dense]['fill'] = args.dense_color
@@ -121,5 +121,3 @@ if __name__ == "__main__":
 
     visual_filename = os.path.join(args.output_path,'model_visualization.png')
     visualkeras.layered_view(model, color_map=color_map, legend=True, font=font, draw_volume=True, scale_xy=0.8, scale_z=0.1, to_file=visual_filename)
-
-

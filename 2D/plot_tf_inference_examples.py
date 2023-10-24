@@ -30,7 +30,7 @@ import time
 from tensorflow import keras as K
 import settings
 import argparse
-from dataloader_oct_png import DatasetGenerator, get_oct_filelist
+from dataloader_2d import DatasetGenerator, get_2d_filelist
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -72,15 +72,15 @@ def test_intel_tensorflow():
     Check if Intel version of TensorFlow is installed
     """
     import tensorflow as tf
-    
+
     print("We are using Tensorflow version {}".format(tf.__version__))
-           
+
     major_version = int(tf.__version__.split(".")[0])
     if major_version >= 2:
        from tensorflow.python import _pywrap_util_port
        print("Intel-optimizations (DNNL) enabled:", _pywrap_util_port.IsMklEnabled())
     else:
-       print("Intel-optimizations (DNNL) enabled:", tf.pywrap_tensorflow.IsMklEnabled()) 
+       print("Intel-optimizations (DNNL) enabled:", tf.pywrap_tensorflow.IsMklEnabled())
 
 test_intel_tensorflow()
 
@@ -112,7 +112,7 @@ def calc_soft_dice(target, prediction, smooth=0.0001):
 
 
 def plot_results(ds, batch_num, png_directory):
-    
+
     plt.figure(figsize=(10,10))
 
     img, msk = next(ds.ds)
@@ -120,7 +120,7 @@ def plot_results(ds, batch_num, png_directory):
     # TODO to be decided
     #idx = np.argmax(np.sum(np.sum(msk[:,:,:,0], axis=1), axis=1)) # find the slice with the largest tumor
     idx = np.random.randint(0, args.batch_size-1) # randomly find a slice in the current batch
-    
+
     plt.subplot(1, 3, 1)
     plt.imshow(img[idx, :, :, 0], cmap="bone") #, origin="upper") # comment "lower to avoid inverting
     plt.title("Image", fontsize=20)
@@ -132,12 +132,12 @@ def plot_results(ds, batch_num, png_directory):
     plt.subplot(1, 3, 3)
 
     print("Index {}: ".format(idx), end="")
-    
+
     # Predict using the TensorFlow model
     start_time = time.time()
     prediction = model.predict(img[[idx]])
     print("Elapsed time = {:.4f} msecs, ".format(1000.0*(time.time()-start_time)), end="")
-    
+
     plt.imshow(prediction[0,:,:,0], cmap="bone") #, origin="lower")
     dice_coef = calc_dice(msk[idx], prediction)
     print("Dice coefficient = {:.4f}, ".format(dice_coef), end="")
@@ -146,12 +146,12 @@ def plot_results(ds, batch_num, png_directory):
     save_name = os.path.join(png_directory, "prediction_tf_{}_{}.png".format(batch_num, idx))
     print("Saved as: {}".format(save_name))
     plt.savefig(save_name)
-        
+
 if __name__ == "__main__":
 
     model_filename = os.path.join(args.output_path, args.inference_filename)
 
-    trainFiles, validateFiles, testFiles = get_oct_filelist(data_path=args.data_path, seed=args.seed, split=args.split)
+    trainFiles, validateFiles, testFiles = get_2d_filelist(data_path=args.data_path, seed=args.seed, split=args.split)
 
     ds_test = DatasetGenerator(testFiles, batch_size=args.batch_size, crop_dim=[args.crop_dim,args.crop_dim], augment=False, seed=args.seed)
 
@@ -162,8 +162,8 @@ if __name__ == "__main__":
     else:
         from model import unet
         unet_model = unet()
-        
-    
+
+
     model = unet_model.load_model(model_filename)
 
     # Create output directory for images
@@ -173,20 +173,20 @@ if __name__ == "__main__":
 
     for batchnum in range(10):
         plot_results(ds_test, batchnum, png_directory)
-        
+
     #------------------------------------------------------#
     #  calculate average dice over the whole test dataset  #
     #------------------------------------------------------#
     ds_test_all = DatasetGenerator(testFiles, batch_size=len(testFiles), #read all at one batch
                                     crop_dim=[args.crop_dim,args.crop_dim], augment=False, seed=args.seed)
     dice_ave=0
-    images, masks = next(ds_test_all.ds) # this is one batch which currently is the whole test data 
-    #TODO crop the data?    
+    images, masks = next(ds_test_all.ds) # this is one batch which currently is the whole test data
+    #TODO crop the data?
     for i in range(len(images)):
         img, msk = images[i,:,:,0], masks[i,:,:,0]
         pred = model.predict(images[[i]])[0,:,:,0]
         dice_ave+=calc_dice(msk,pred)
 
     dice_ave=np.sum(dice_ave)/float(len(images))
-    
+
     print("dice_ave:", dice_ave)

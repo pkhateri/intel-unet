@@ -92,10 +92,10 @@ if __name__ == "__main__":
     print("Loading the data from the OCT png image directory to a TensorFlow data loader ...")
     print("-" * 30)
 
-    if args.input_type=='oct_png':
-        from dataloader_oct_png import DatasetGenerator, get_oct_filelist
-        trainFiles, validateFiles, testFiles = get_oct_filelist(data_path=args.data_path, seed=args.seed, split=args.split)
-    elif args.input_type=='decathlon':
+    if args.input_type=='2D':
+        from dataloader_2d import DatasetGenerator, get_2d_filelist
+        trainFiles, validateFiles, testFiles = get_2d_filelist(data_path=args.data_path, seed=args.seed, split=args.split)
+    elif args.input_type=='3D':
         from dataloader import DatasetGenerator, get_decathlon_filelist
         trainFiles, validateFiles, testFiles = get_decathlon_filelist(data_path=args.data_path, seed=args.seed, split=args.split)
 

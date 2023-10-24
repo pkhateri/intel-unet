@@ -33,8 +33,15 @@ pip install protobuf # parisa added: to avoid error
 # jupyter notebook in venv
 go inside the venv: source venv3.7/bin/activate
 pip install ipykernel
-python -m ipykernel install --user --name=venv3.7 
+python -m ipykernel install --user --name=venv3.7
 jupyter notebook -> kernel -> choose kernel
+
+# input data
+- in the setting.py file choose the input image type (2D/3D).
+- The 3D supports decathlon input format.
+- The 2D supports either png input files (zoltan data) or json files (progstar). In any case, the png or json files should be divided in 3 folders: train/val/test, and each image is represented by one png/json file.
+- in case of 2D png inputs, red channel represents the image and the green channel represents the label.
+- in case of 2D json, the json file contains the path to the image and label files.
 
 # run the training
 `cd 2D`
@@ -45,7 +52,12 @@ modify setting.py for input paramaters
 # run the inference (test)
 `python plot_tf_inference_examples.py`
 
-# run the tensorboard 
+# run the tensorboard
 tensorboard --logdir 2D/output/output_dir/keras_tensorboard_transposed/unet_block0_inter4_intra4/
 - specify the port if run on remote:
 tensorboard --logdir 2D/output/output_dir/keras_tensorboard_transposed/unet_block0_inter4_intra4/ --port 6006
+
+# Genreate json files for progstar data:
+```
+python3 create_json_files_for_progstar_dataset.py -c train.csv -o /projec/parisa/data/progstar/intel_unet/train
+```

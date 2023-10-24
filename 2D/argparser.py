@@ -97,8 +97,6 @@ parser.add_argument("--input_filename",
                     default=os.path.join(settings.OUT_PATH,settings.INFERENCE_FILENAME))
 parser.add_argument("--input_type",
                     default=settings.INPUT_TYPE,
-                    help="input image type: oct_png or decathlon")
+                    help="input image type: 2D or 3D")
 
 args = parser.parse_args()
-
-
