@@ -21,7 +21,7 @@ def write_json_file(output_path, img_path, laberl_path, bscan_num_for_png):
     writedata = {}
     writedata["imagePath"] = img_path
     writedata["labelPath"] = laberl_path
-    writedata["bScanNumForPNG"] = bscan_num # iowa and png have different conventions for bscan numbers (n_png = 48 - n_iowa)
+    writedata["bScanNumForPNG"] = bscan_num_for_png # iowa and png have different conventions for bscan numbers (n_png = 48 - n_iowa)
 
     '''
     dump the dictionary to the output file

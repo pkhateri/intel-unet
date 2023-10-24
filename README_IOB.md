@@ -26,7 +26,7 @@ pip install protobuf # parisa added: to avoid error
 - go to the singularity recipe folder
 - singularity build --fakeroot intel-unet-prerequisites-22.06-tf2-py3.sif intel-unet-prerequisites-22.06-tf2-py3.def
 ## run the container
-- singularity run --nv --bind /projects /projects/parisa/git_software/intel-unet/singularity/intel-unet-prerequisites-20.08-tf2-py3.sif
+- singularity run --nv -B /projects -B /usr/local/scratch /projects/parisa/git_software/intel-unet/singularity/intel-unet-prerequisites-20.08-tf2-py3.sif
 ## ready to go
 
 
@@ -42,6 +42,10 @@ jupyter notebook -> kernel -> choose kernel
 - The 2D supports either png input files (zoltan data) or json files (progstar). In any case, the png or json files should be divided in 3 folders: train/val/test, and each image is represented by one png/json file.
 - in case of 2D png inputs, red channel represents the image and the green channel represents the label.
 - in case of 2D json, the json file contains the path to the image and label files.
+- you can use `2D/create_json_files_for_progstar_dataset.py` in order to generate json files given a csv file for the progstar data:
+```
+python create_json_files_for_progstar_dataset.py -c /projects/parisa/data/progstar/intel_unet/train.csv -o /projects/parisa/data/progstar/intel_unet/train/
+```
 
 # run the training
 `cd 2D`

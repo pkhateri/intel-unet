@@ -28,19 +28,19 @@ def get_2d_filelist(data_path, seed=816, split=0.85):
             trainFiles = img_files
         elif d == "val":
             valFiles = img_files
-        elif d = "test":
+        elif d == "test":
             testFiles = img_files
 
     # Print information about the Decathlon experiment data
     print("*" * 30)
     print("=" * 30)
     print("Number of training files   = {}".format(len(trainFiles)))
-    print("Number of validation files = {}".format(len(validateFiles)))
+    print("Number of validation files = {}".format(len(valFiles)))
     print("Number of testing files    = {}".format(len(testFiles)))
     print("=" * 30)
     print("*" * 30)
 
-    return trainFiles, validateFiles, testFiles
+    return trainFiles, valFiles, testFiles
 
 def get_label_from_iowa_xml_file(xml_file, bscan_num_for_png):
     """
@@ -91,7 +91,14 @@ class DatasetGenerator(Sequence):
 
         from PIL import Image
 
-        img = np.array(Image.open(filenames[0]).convert("RGB")) # Load the first image
+        # Load the first image
+        if filenames[0].endswith(".png"):
+            img = np.array(Image.open(filenames[0]).convert("RGB"))
+        elif filenames[0].endswith(".json"):
+            with open(filenames[0], 'r') as jsn:
+                dict = json.load(jsn)
+                img_path = dict["imagePath"]
+                img = np.array(Image.open(img_path).convert("RGB"))
 
         self.slice_dim = 2  # this is the RGB channel dimension
 
@@ -217,12 +224,18 @@ class DatasetGenerator(Sequence):
                     try:
                         with open(filename, 'r') as jsn:
                             dict = json.load(jsn)
-                            img_file = dict["imagePath"]
-                            label_file = dict["labelPath"]
+                            img_path = dict["imagePath"]
+                            label_path = dict["labelPath"]
                             bscan_num_for_png = int(dict["bScanNumForPNG"])
-                            r, g, b = Image.open(img_path).convert("RGB").split()
-                            img = np.array(r, dtype=np.float32)/255
-                            label = get_label_from_iowa_xml_file(label_file, bscan_num_for_png)
+                            rgb_img = np.array(Image.open(img_path).convert("RGB"), dtype=np.float32)/255
+
+                            img = rgb_img[:,:,1] # all channels are the same
+                            img = np.expand_dims(img, axis=-1) # to be abale to concatenate later
+                            img = self.preprocess_img(img)
+
+                            label = get_label_from_iowa_xml_file(label_path, bscan_num_for_png)
+                            label = np.expand_dims(label, axis=-1) # to be abale to concatenate later
+                            label = self.preprocess_label(label)
 
                     except json.JSONDecodeError:
                         print(f"{jsn} is not a valid JSON file.")
@@ -232,7 +245,6 @@ class DatasetGenerator(Sequence):
 
                 # Crop input and label
                 img, label = self.crop_input(img, label)
-
                 if idz == 0:
                     img_stack = img
                     label_stack = label
