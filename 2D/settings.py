@@ -77,3 +77,8 @@ USE_UPSAMPLING = False
 USE_AUGMENTATION = True  # Use data augmentation during training
 USE_DROPOUT = True  # Use spatial dropout in model
 USE_PCONV = False  # If True, Partial Convolution based padding will be used. See https://arxiv.org/pdf/1811.11718.pdf
+
+# Use saved model
+# The saved model should be the same as the current model
+USE_SAVED_MODEL = False
+SAVED_MODEL_PATH = os.path.join("./output/20231025_2d_unet_progstart_png_adam_lr0001_filter16_batchsize10_epoch100_earlystop12_augmentationFalse/saved_model.pb")

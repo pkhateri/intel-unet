@@ -98,5 +98,12 @@ parser.add_argument("--input_filename",
 parser.add_argument("--input_type",
                     default=settings.INPUT_TYPE,
                     help="input image type: 2D or 3D")
+parser.add_argument("--use_saved_model",
+                    default=settings.USE_SAVED_MODEL,
+                    help="start the model from pretrained weights",
+                    action="store_true")
+parser.add_argument("--saved_model_path",
+                    help="path to the previously trained weights (saved model)",
+                    default=os.path.join(settings.SAVED_MODEL_PATH))
 
 args = parser.parse_args()
