@@ -136,9 +136,9 @@ if __name__ == "__main__":
     If there is a pre-trained saved model, load weights and start from there.
     """
     if args.use_saved_model:
-        saved_model = args.saved_model_path
-        if os.path.isfile(saved_model):
-            model.load_weights(saved_model)
+        if os.path.exists(args.saved_model_path):
+            model.load_weights(os.path.join(args.saved_model_path, "variables", "variables"))
+            print("#### saved model loaded ####")
 
     """
     Step 3: Train the model on the data
