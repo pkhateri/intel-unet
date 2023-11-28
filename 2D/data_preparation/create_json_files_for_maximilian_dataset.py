@@ -22,30 +22,31 @@ def read_csv_file(csv_filename):
     return rows
 
 
-def write_json_file(output_dir, xml_path, patient_id, bscan_num):
+def write_json_file(output_dir, img_path, label_path, bscan_num_for_png):
     '''
     create a dictionary
     '''
     writedata = {}
-    writedata["xmlPath"] = xml_path
-    writedata["bScanNum"] = bscan_num # iowa and tiff have different conventions for bscan numbers (n_tiff = N_tot - n_iowa)
+    writedata["imagePath"] = img_path
+    writedata["labelPath"] = label_path
+    writedata["bScanNumForPNG"] = bscan_num_for_png # iowa and png have different conventions for bscan numbers (n_png = 48 - n_iowa)
 
     '''
     dump the dictionary to the output file
     '''
-    output_json_file = patient_id + "_" + bscan_num + ".json"
+    output_json_file = img_path.split("/")[-2]+str(bscan_num).zfill(3)+'_'+os.path.basename(img_path)[:-4]+".json"
+    print(output_json_file)
     with open(os.path.join(output_dir, output_json_file), 'w') as outfile:
         json.dump(writedata, outfile)
 
-
 def main(argv):
     '''
-    default inputs:
+    inputs:
     '''
-    csv_file = '' #'train.csv' Kontrolle_01, img_id.tiff, bscan_num
+    csv_file = '' #'/projects/parisa/data/maximilian/intel_unet/train.csv' Kontrolle_01, img_id.tiff, bscan_num
     output_dir = '' #'/projec/parisa/data/maximilian/intel_unet/train/'
     img_dir = '' #'/projects/parisa/data/maximilian/OCT-Normal-Data/'
-    label_dir = '' #'/projects/parisa/data/maximilian/OCT-Normal-Data/iowa_format'
+    label_dir = '' #'/projects/parisa/data/maximilian/OCT-Normal-Data/iowa_format/'
 
     opts, args = getopt.getopt(argv,"hc:o:i:l:",["csv_file=","output_dir=", "img_dir=", "label_dir="])
     for opt, arg in opts:
