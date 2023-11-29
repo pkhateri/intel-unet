@@ -59,7 +59,7 @@ modify setting.py for input paramaters
 # run the tensorboard
 tensorboard --logdir 2D/output/output_dir/keras_tensorboard_transposed/unet_block0_inter4_intra4/
 - specify the port if run on remote:
-tensorboard --logdir 2D/output/output_dir/keras_tensorboard_transposed/unet_block0_inter4_intra4/ --port 6006
+tensorboard --port 6006 --logdir 2D/output/output_dir/keras_tensorboard_transposed/unet_block0_inter4_intra4/
 
 # Genreate json files for progstar data:
 ```
