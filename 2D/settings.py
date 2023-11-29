@@ -20,15 +20,16 @@
 import psutil
 import os
 
-DATA_PATH = os.path.join("/projects/parisa/data/progstar/intel_unet/")
+DATA_PATH = os.path.join("/projects/parisa/data/maximilian/intel_unet/")
+#DATA_PATH = os.path.join("/projects/parisa/data/progstar/intel_unet/")
 #DATA_PATH = os.path.join("/projects/parisa/data/zoltan/manual_annotation/merged/png/")
 #DATA_PATH = os.path.join('/projects/parisa/data/decathlon/Task01_BrainTumour/')
 OUT_PATH = os.path.join("./output/")
-INFERENCE_FILENAME = "test"
+INFERENCE_FILENAME = "test" #"20231128_2d_unet_maximilian_png_adam_lr0001_filter16_batchsize2_epoch100_earlystop12_augmentationFalse"
 OUTPUT_PNGS = os.path.join("inference_examples", INFERENCE_FILENAME)
 INPUT_TYPE = '2D' # 2D or 3D
 
-EPOCHS = 100  # Number of epochs to train
+EPOCHS = 2  # Number of epochs to train
 
 """
 If the batch size is too small, then training is unstable.
@@ -41,7 +42,7 @@ enough memory, it is easiest just to select a sufficiently
 large batch size to make sure we have a few slices with
 tumors in each batch.
 """
-BATCH_SIZE = 20
+BATCH_SIZE = 10
 
 # which model
 MODEL_NAME= "unet" # unet or deep_unet
@@ -69,17 +70,17 @@ import multiprocessing
 NUM_INTRA_THREADS = min(len(psutil.Process().cpu_affinity()), psutil.cpu_count(logical=False))
 
 CROP_DIM=-1  # Crop height and width to this size
-RESIZE_DIM=(-1,-1)   # resize to (width, height)
+RESIZE_DIM=(-1,-1)
 SEED=816      # Random seed
 TRAIN_TEST_SPLIT=0.80 # The train/test split
 
 CHANNELS_FIRST = False
 USE_UPSAMPLING = False
-USE_AUGMENTATION = True  # Use data augmentation during training
+USE_AUGMENTATION = False  # Use data augmentation during training
 USE_DROPOUT = True  # Use spatial dropout in model
 USE_PCONV = False  # If True, Partial Convolution based padding will be used. See https://arxiv.org/pdf/1811.11718.pdf
 
 # Use saved model
 # The saved model should be the same as the current model
 USE_SAVED_MODEL = False
-SAVED_MODEL_PATH = os.path.join("./output/20231025_2d_unet_progstart_png_adam_lr0001_filter16_batchsize10_epoch100_earlystop12_augmentationFalse/saved_model.pb")
+SAVED_MODEL_PATH = os.path.join("./output/20231025_2d_unet_progstart_png_adam_lr0001_filter16_batchsize10_epoch100_earlystop12_augmentationFalse/")

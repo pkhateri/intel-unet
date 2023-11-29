@@ -88,7 +88,7 @@ class DatasetGenerator(Sequence):
     TensorFlow Dataset from Python/NumPy Iterator
     """
 
-    def __init__(self, filenames, batch_size=8, crop_dim=[240,240], resize_dim, augment=False, seed=816):
+    def __init__(self, filenames, batch_size=8, crop_dim=[240,240], resize_dim=(-1,-1), augment=False, seed=816):
 
         from PIL import Image
 
