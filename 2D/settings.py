@@ -69,6 +69,7 @@ import multiprocessing
 NUM_INTRA_THREADS = min(len(psutil.Process().cpu_affinity()), psutil.cpu_count(logical=False))
 
 CROP_DIM=-1  # Crop height and width to this size
+RESIZE_DIM=(-1,-1)   # resize to (width, height)
 SEED=816      # Random seed
 TRAIN_TEST_SPLIT=0.80 # The train/test split
 

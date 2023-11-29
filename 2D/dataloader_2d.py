@@ -9,6 +9,7 @@ import numpy as np
 import os
 import json
 import settings
+from scipy.ndimage import zoom
 
 def get_2d_filelist(data_path, seed=816, split=0.85):
     """
@@ -87,7 +88,7 @@ class DatasetGenerator(Sequence):
     TensorFlow Dataset from Python/NumPy Iterator
     """
 
-    def __init__(self, filenames, batch_size=8, crop_dim=[240,240], augment=False, seed=816):
+    def __init__(self, filenames, batch_size=8, crop_dim=[240,240], resize_dim, augment=False, seed=816):
 
         from PIL import Image
 
@@ -108,6 +109,9 @@ class DatasetGenerator(Sequence):
         if crop_dim[1] == -1:
             crop_dim[1] = img.shape[1]
         self.crop_dim = crop_dim
+
+        # resize_dim = (-1,-1), then don't resize
+        self.resize_dim = resize_dim
 
         self.filenames = filenames
         self.batch_size = batch_size
@@ -186,6 +190,17 @@ class DatasetGenerator(Sequence):
 
             return img[tuple(slices)], msk[tuple(slices)]
 
+    def resize_input(self, img, label):
+        """
+        resize input images using bilinear interpolation
+        """
+        sf_width = self.resize_dim[0]/im.shape[0] # scale factor for width
+        sf_height = self.resize_dim[1]/im.shape[1] # scale factor for width
+        # resize with bilinear interpolation
+        img_resized = zoom(img, zoom=(sf_width, sf_height), order=1, mode='nearest')
+        label_resized = zoom(label, zoom=(sf_width, sf_height), order=1, mode='nearest')
+        return img_resized, label_resized
+
     def generate_batch_from_files(self):
         """
         Python generator which goes through a list of filenames to load.
@@ -242,9 +257,12 @@ class DatasetGenerator(Sequence):
                 else:
                     os.system.exit("Error: strange input file!", filename)
 
-
                 # Crop input and label
                 img, label = self.crop_input(img, label)
+                # resize input after crop
+                if self.resize_dim != (-1,-1):
+                    img, label = self.resize_input(img, label)
+
                 if idz == 0:
                     img_stack = img
                     label_stack = label

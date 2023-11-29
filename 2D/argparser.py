@@ -55,6 +55,8 @@ parser.add_argument("--seed", type=int, default=settings.SEED,
                     help="Seed for random number generation")
 parser.add_argument("--crop_dim", type=int, default=settings.CROP_DIM,
                     help="Size to crop images (square, in pixels). If -1, then no cropping.")
+parser.add_argument("--resize_dim", type=lambda s: tuple(map(int, s.split(','))), default=settings.RESIZE_DIM,
+                    help="Resize images to this new size (width, height). If (-1,-1), then no resizing.")
 parser.add_argument("--blocktime", type=int,
                     default=settings.BLOCKTIME,
                     help="blocktime")
