@@ -16,7 +16,7 @@ Steps:
     - csv files are formatted as: Kontrolle_01, img_id.tiff, bscan_num
 """
 data_dir = '/projects/parisa/data/maximilian/OCT-Normal-Data/'
-output_dir = '/projects/parisa/data/maximilian/intel_unet/'
+output_dir = '/projects/parisa/data/maximilian/intel_unet/json/'
 train_csv_file = os.path.join(output_dir, "train.csv")
 val_csv_file = os.path.join(output_dir, "val.csv")
 test_csv_file = os.path.join(output_dir, "test.csv")
