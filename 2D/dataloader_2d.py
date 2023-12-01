@@ -78,8 +78,9 @@ def get_label_from_iowa_xml_file(xml_file, bscan_num_for_png):
                 choroid_arr.append(int(y.text))
 
     label_img = np.zeros((size_y,size_x))
-    for i in range(size_x):
-        label_img[ilm_arr[i]:choroid_arr[i], i] = 1
+    if not (len(ilm_arr)<size_x or len(choroid_arr)<size_x):
+        for i in range(size_x):
+            label_img[ilm_arr[i]:choroid_arr[i], i] = 1
 
     return label_img
 
