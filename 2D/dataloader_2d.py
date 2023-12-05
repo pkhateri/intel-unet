@@ -94,7 +94,7 @@ class DatasetGenerator(Sequence):
         from PIL import Image
 
         # Load the first image
-        if filenames[0].endswith(".png"):
+        if filenames[0].endswith(".png") or filenames[0].endswith(".tif"):
             img = np.array(Image.open(filenames[0]).convert("RGB"))
         elif filenames[0].endswith(".json"):
             with open(filenames[0], 'r') as jsn:
@@ -226,7 +226,7 @@ class DatasetGenerator(Sequence):
             for idz in range(self.batch_size): #loop to fill a batch with 2d images from png files
 
                 filename = self.filenames[idx]
-                if filename.endswith(".png"):
+                if filename.endswith(".png") or filename.endswith(".tif"):
                     img_and_label = np.array(Image.open(filename).convert("RGB"), dtype=np.float32)/255
 
                     img = img_and_label[:,:,1]  # the green channel is the image
