@@ -113,7 +113,7 @@ def calc_soft_dice(target, prediction, smooth=0.0001):
 
 def plot_results(ds, batch_num, png_directory):
 
-    plt.figure(figsize=(10,10))
+    plt.figure(figsize=(36,7))
 
     img, msk = next(ds.ds)
 
@@ -142,10 +142,12 @@ def plot_results(ds, batch_num, png_directory):
     dice_coef = calc_dice(msk[idx], prediction)
     print("Dice coefficient = {:.4f}, ".format(dice_coef), end="")
     plt.title("Prediction\nDice = {:.4f}".format(dice_coef), fontsize=20)
+    plt.tight_layout()
 
     save_name = os.path.join(png_directory, "prediction_tf_{}_{}.png".format(batch_num, idx))
     print("Saved as: {}".format(save_name))
     plt.savefig(save_name)
+    plt.close()
 
 if __name__ == "__main__":
 
@@ -171,7 +173,7 @@ if __name__ == "__main__":
     if not os.path.exists(png_directory):
         os.makedirs(png_directory)
 
-    for batchnum in range(10):
+    for batchnum in range(30):
         plot_results(ds_test, batchnum, png_directory)
 
     #------------------------------------------------------#
