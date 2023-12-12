@@ -1,26 +1,11 @@
 #
-# -*- coding: utf-8 -*-
-#
-# Copyright (c) 2019 Intel Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-# SPDX-License-Identifier: EPL-2.0
+# Parisa Khateri @ 07.12.2023
 #
 
 """
-Takes a trained model and performs inference on a few validation examples.
+Takes a trained model and performs prediction on the given input images
 """
+
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"  # Get rid of the AVX, SSE warnings
 
@@ -31,6 +16,8 @@ from tensorflow import keras as K
 import settings
 import argparse
 from dataloader_2d import DatasetGenerator, get_2d_filelist
+from PIL import Image
+import json
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -43,34 +30,20 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument("--data_path", default=settings.DATA_PATH,
                     help="the path to the data")
-parser.add_argument("--output_path", default=settings.OUT_PATH,
-                    help="the folder to save the model and checkpoints")
-parser.add_argument("--inference_filename", default=settings.INFERENCE_FILENAME,
-                    help="the TensorFlow inference model filename")
 parser.add_argument("--use_pconv",help="use partial convolution based padding",
                     action="store_true",
                     default=settings.USE_PCONV)
 parser.add_argument("--output_pngs", default=settings.OUTPUT_PNGS,
                     help="the directory for the output prediction pngs")
-parser.add_argument("--intraop_threads", default=settings.NUM_INTRA_THREADS,
-                    type=int, help="Number of intra-op-parallelism threads")
-parser.add_argument("--interop_threads", default=settings.NUM_INTER_THREADS,
-                    type=int, help="Number of inter-op-parallelism threads")
 parser.add_argument("--crop_dim", default=settings.CROP_DIM,
                     type=int, help="Crop dimension for images")
 parser.add_argument("--seed", default=settings.SEED,
                     type=int, help="Random seed")
 parser.add_argument("--split", type=float, default=settings.TRAIN_TEST_SPLIT,
                     help="Train/testing split for the data")
-parser.add_argument("--batch_size", type=float, default=settings.BATCH_SIZE,
-                    help="the batch size for training")
 parser.add_argument("--input_type",
                     default=settings.INPUT_TYPE,
                     help="input image type: 2D or 3D")
-parser.add_argument("--use_saved_model",
-                    default=settings.USE_SAVED_MODEL,
-                    help="start the model from pretrained weights",
-                    action="store_true")
 parser.add_argument("--saved_model_path",
                     help="path to the previously trained weights (saved model)",
                     default=os.path.join(settings.SAVED_MODEL_PATH))
@@ -94,41 +67,42 @@ def test_intel_tensorflow():
 
 test_intel_tensorflow()
 
-def plot_results(ds, batch_num, png_directory):
+def get_2d_filelist(data_path):
+    try:
+        if os.path.isdir(data_path):
+            img_files = [os.path.join(data_path, f)
+                for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f))]
+    except IOError as e:
+        raise Exception("Folder {} doesn't exist".format(data_path))
+    # Print information about the loaded data
+    print("*" * 30)
+    print("=" * 30)
+    print("Number of files loaded  = {}".format(len(img_files)))
+    print("=" * 30)
+    print("*" * 30)
+    return img_files
 
-    plt.figure(figsize=(10,10))
-
-    img, msk = next(ds.ds)
-
-    # TODO to be decided
-    #idx = np.argmax(np.sum(np.sum(msk[:,:,:,0], axis=1), axis=1)) # find the slice with the largest tumor
-    idx = np.random.randint(0, args.batch_size-1) # randomly find a slice in the current batch
-
-    plt.subplot(1, 3, 1)
-    plt.imshow(img[idx, :, :, 0], cmap="bone") #, origin="upper") # comment "lower to avoid inverting
-    plt.title("Image", fontsize=20)
-
-    plt.subplot(1, 3, 2)
-    plt.imshow(msk[idx, :, :], cmap="bone") #, origin="lower")
-    plt.title("Ground truth", fontsize=20)
-
-    plt.subplot(1, 3, 3)
-
-    print("Index {}: ".format(idx), end="")
-
-    # Predict using the TensorFlow model
-    start_time = time.time()
-    prediction = model.predict(img[[idx]])
-    print("Elapsed time = {:.4f} msecs, ".format(1000.0*(time.time()-start_time)), end="")
-
-    plt.imshow(prediction[0,:,:,0], cmap="bone") #, origin="lower")
-    dice_coef = calc_dice(msk[idx], prediction)
-    print("Dice coefficient = {:.4f}, ".format(dice_coef), end="")
-    plt.title("Prediction\nDice = {:.4f}".format(dice_coef), fontsize=20)
-
-    save_name = os.path.join(png_directory, "prediction_tf_{}_{}.png".format(batch_num, idx))
-    print("Saved as: {}".format(save_name))
-    plt.savefig(save_name)
+def get_boundaries_from_mask(mask):
+    """
+    input: mask is a numpy array with binary values (0,1)
+    outputs:
+         - 2 arrays of size=n_columns, each element representing y index of the boundary position
+         - a 2d numpy array representing the boundary img with binary values
+    """
+    n_rows = mask.shape[0] # number of rows
+    n_columns = mask.shape[1] # number of columns
+    boundary_1 = np.zeros((n_columns))
+    boundary_2 = np.zeros((n_columns))
+    boundary_img = np.zeros((n_rows, n_columns))
+    for j in range(n_columns):
+        for i in range(n_rows):
+            if i>0 and mask[i-1][j]==0 and mask[i][j]==1:
+                boundary_1[j]=i
+                boundary_img[i][j]=1
+            if i<n_rows-1 and mask[i+1][j]==0 and mask[i][j]==1:
+                boundary_2[j]=i
+                boundary_img[i][j]=1
+    return boundary_1, boundary_2, boundary_img
 
 if __name__ == "__main__":
 
@@ -149,15 +123,50 @@ if __name__ == "__main__":
 
     # load all data in one batch and predict them one by one over a loop
     if args.input_type=='2D':
-        from dataloader_2d import DatasetGenerator, get_2d_filelist
-        __, __, testFiles = get_2d_filelist(data_path=args.data_path, seed=args.seed, split=args.split)
+        from dataloader_2d import DatasetGenerator
+        testFiles = get_2d_filelist(data_path=args.data_path)
     ds_test_all = DatasetGenerator(testFiles, batch_size=len(testFiles), #read all at one batch
                                     crop_dim=[args.crop_dim,args.crop_dim], augment=False, seed=args.seed)
     images, __ = next(ds_test_all.ds) # this is one batch which currently is the whole test data
     for i in range(len(images)):
-        pred = model.predict(images[[i]])[0,:,:,0]
-        plt.imshow(pred, cmap="bone") #, origin="lower")
-        #plt.title("Prediction\nDice = {:.4f}".format(dice_coef), fontsize=20)
-        output_filename = os.path.join(args.output_pngs, "prediction_{}.png".format(i))
-        print("Saved as: {}".format(output_filename))
-        plt.savefig(output_filename)
+        filename = os.path.basename(testFiles[i])
+        img = images[i]
+        img = (img - np.min(img))/(np.max(img) - np.min(img))
+        img_255 = (img*255).astype(np.uint8)
+        print("Predicting: {}".format(filename))
+        pred_arr = model.predict(images[[i]])[0,:,:,0]
+        #mid_range = pred[(pred>0.2)*(pred<0.8)]
+        #mid_range_hist = np.hstack(mid_range)
+        #_ = plt.hist(mid_range_hist, bins=20)
+        pred_arr_255 = (pred_arr* 255).astype(np.uint8)
+        pred_img = Image.fromarray(np.dstack([pred_arr_255, pred_arr_255, pred_arr_255]))
+        #pred_filename = os.path.join(args.output_pngs, "prediction_{}.tif".format(filename[:-4]))
+        #pred_img.save(pred_filename)
+
+        thrsh = 0.5
+        mask_arr = (pred_arr>thrsh).astype(int)
+        mask_arr_255 = (mask_arr* 255).astype(np.uint8)
+        mask_img = Image.fromarray(np.dstack([mask_arr_255, mask_arr_255, mask_arr_255]))
+        mask_filename = os.path.join(args.output_pngs, "mask_{}.tif".format(filename[:-4]))
+        mask_img.save(mask_filename)
+
+        boundary_1, boundary_2, boundary_arr = get_boundaries_from_mask(mask_arr)
+        boundary_arr_255 = (boundary_arr* 255).astype(np.uint8)
+        boundary_img = Image.fromarray(np.dstack([boundary_arr_255,img_255,img_255])).convert("RGB")
+        boundary_filename = os.path.join(args.output_pngs, "boundary_{}.tif".format(filename[:-4]))
+        boundary_img.save(boundary_filename)
+        
+        output_dict = {
+                        "img": filename,
+                        "boundary_1": boundary_1.tolist(),
+                        "boundary_2": boundary_2.tolist(),
+                      }
+        json_filename = os.path.join(args.output_pngs, "{}.json".format(filename[:-4]))
+        with open(json_filename, 'w') as json_file:
+            json.dump(output_dict, json_file)
+
+        #plt.plot(boundary_1, '-r')
+        #plt.plot(boundary_2, '-b')
+        #plot_name = os.path.join(args.output_pngs, "plot_{}.png".format(filename[:-4]))
+        #plt.savefig(plot_name) 
+        #plt.close()
