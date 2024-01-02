@@ -15,7 +15,7 @@ import time
 from tensorflow import keras as K
 import settings
 import argparse
-from dataloader_2d import DatasetGenerator, get_2d_filelist
+from dataloader_2d import DatasetGenerator
 from PIL import Image
 import json
 
@@ -27,7 +27,6 @@ matplotlib.use("Agg")
 parser = argparse.ArgumentParser(
     description="TensorFlow Inference example for trained 2D U-Net model on BraTS.",
     add_help=True, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
 parser.add_argument("--data_path", default=settings.DATA_PATH,
                     help="the path to the data")
 parser.add_argument("--use_pconv",help="use partial convolution based padding",
@@ -82,6 +81,91 @@ def get_2d_filelist(data_path):
     print("*" * 30)
     return img_files
 
+def get_dataset(filenames, batch_size):
+    """
+    Return a dataset
+    """
+    ds = self.generate_batch_from_files(filenames, batch_size)
+
+    return ds
+
+def generate_batch_from_files(filenames, batch_size):
+    """
+    Python generator which goes through a list of filenames to load.
+    The files are 2D image. We yield them as a batch of 2D slices.
+    This generator keeps yielding a batch of 2D slices at a time until all 2D images are loaded.
+
+    idx: to track the number of 2d images which have been loaded so far. idx[0,num_filenames]
+    idz: index for adding 2d images (files) to the batch. idz[0,batch_size]
+    """
+
+    idx = 0
+    filename_batch = []
+    while True:
+        """
+        Pack N_IMAGES files at a time to queue
+        """
+        for idz in range(batch_size): #loop to fill a batch with 2d images from png files
+
+            filename = filenames[idx]
+            if filename.endswith(".png") or filename.endswith(".tif"):
+                img_and_label = np.array(Image.open(filename).convert("RGB"), dtype=np.float32)/255
+
+                img = img_and_label[:,:,1]  # the green channel is the image
+                img = np.expand_dims(img, axis=-1) # to be abale to concatenate later
+                img = self.preprocess_img(img)
+
+                label = img_and_label[:,:,0] # the red channel is the label
+                label = np.expand_dims(label, axis=-1) # to be abale to concatenate later
+                label = self.preprocess_label(label)
+            elif filename.endswith(".json"):
+                try:
+                    with open(filename, 'r') as jsn:
+                        dict = json.load(jsn)
+                        img_path = dict["imagePath"]
+                        label_path = dict["labelPath"]
+                        bscan_num_for_png = int(dict["bScanNumForPNG"])
+                        rgb_img = np.array(Image.open(img_path).convert("RGB"), dtype=np.float32)/255
+
+                        img = rgb_img[:,:,1] # all channels are the same
+                        img = np.expand_dims(img, axis=-1) # to be abale to concatenate later
+                        img = self.preprocess_img(img)
+
+                        label = get_label_from_iowa_xml_file(label_path, bscan_num_for_png)
+                        label = np.expand_dims(label, axis=-1) # to be abale to concatenate later
+                        label = self.preprocess_label(label)
+
+                except json.JSONDecodeError:
+                    print(f"{jsn} is not a valid JSON file.")
+            else:
+                os.system.exit("Error: strange input file!", filename)
+
+            if idz == 0:
+                img_stack = img
+                label_stack = label
+            else:
+                img_stack = np.concatenate((img_stack,img), axis=self.slice_dim)
+                label_stack = np.concatenate((label_stack,label), axis=self.slice_dim)
+
+            filename_batch.append(filename)
+
+            idx += 1
+            if idx >= len(filenames):
+                idx = 0
+                np.random.shuffle(filenames) # Shuffle the filenames for the next iteration
+
+        # outside "for" loop, inside "while" loop
+        img_batch = img_stack
+        label_batch = label_stack
+
+        if len(np.shape(img_batch)) == 3:
+            img_batch = np.expand_dims(img_batch, axis=-1)
+        if len(np.shape(label_batch)) == 3:
+            label_batch = np.expand_dims(label_batch, axis=-1)
+
+        # permute the dimension, i.e. bring channel to first position
+        yield np.transpose(img_batch, [2,0,1,3]).astype(np.float32), np.transpose(label_batch, [2,0,1,3]).astype(np.float32), filename_batch
+
 def get_boundaries_from_mask(mask):
     """
     input: mask is a numpy array with binary values (0,1)
@@ -124,12 +208,12 @@ if __name__ == "__main__":
     # load all data in one batch and predict them one by one over a loop
     if args.input_type=='2D':
         from dataloader_2d import DatasetGenerator
-        testFiles = get_2d_filelist(data_path=args.data_path)
-    ds_test_all = DatasetGenerator(testFiles, batch_size=len(testFiles), #read all at one batch
-                                    crop_dim=[args.crop_dim,args.crop_dim], augment=False, seed=args.seed)
-    images, __ = next(ds_test_all.ds) # this is one batch which currently is the whole test data
+        test_files = get_2d_filelist(data_path=args.data_path)
+        ds_test = get_dataset(test_files, batch_size=len(testFiles), #read all at one batch
+                              crop_dim=[args.crop_dim,args.crop_dim])
+        images, __, filenames = next(ds_test.ds) # this is one batch which currently is the whole test data
     for i in range(len(images)):
-        filename = os.path.basename(testFiles[i])
+        filename = os.path.basename(filenames[i])
         img = images[i]
         img = (img - np.min(img))/(np.max(img) - np.min(img))
         img_255 = (img*255).astype(np.uint8)
@@ -155,11 +239,11 @@ if __name__ == "__main__":
         boundary_img = Image.fromarray(np.dstack([boundary_arr_255,img_255,img_255])).convert("RGB")
         boundary_filename = os.path.join(args.output_pngs, "boundary_{}.tif".format(filename[:-4]))
         boundary_img.save(boundary_filename)
-        
+
         output_dict = {
                         "img": filename,
-                        "boundary_1": boundary_1.tolist(),
-                        "boundary_2": boundary_2.tolist(),
+                        "ILM": boundary_1.tolist(),
+                        "Choroid": boundary_2.tolist(),
                       }
         json_filename = os.path.join(args.output_pngs, "{}.json".format(filename[:-4]))
         with open(json_filename, 'w') as json_file:
@@ -168,5 +252,5 @@ if __name__ == "__main__":
         #plt.plot(boundary_1, '-r')
         #plt.plot(boundary_2, '-b')
         #plot_name = os.path.join(args.output_pngs, "plot_{}.png".format(filename[:-4]))
-        #plt.savefig(plot_name) 
+        #plt.savefig(plot_name)
         #plt.close()
