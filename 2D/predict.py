@@ -81,13 +81,18 @@ def get_2d_filelist(data_path):
     print("*" * 30)
     return img_files
 
-def get_dataset(filenames, batch_size):
-    """
-    Return a dataset
-    """
-    ds = self.generate_batch_from_files(filenames, batch_size)
 
-    return ds
+def preprocess_img(img):
+    """
+    Preprocessing for the image
+    z-score normalize
+    """
+    return (img - img.mean()) / img.std()
+
+def preprocess_label(label):
+    #TODO: check the effect of this
+    label[label > 0] = 1.0
+    return label
 
 def generate_batch_from_files(filenames, batch_size):
     """
@@ -113,11 +118,11 @@ def generate_batch_from_files(filenames, batch_size):
 
                 img = img_and_label[:,:,1]  # the green channel is the image
                 img = np.expand_dims(img, axis=-1) # to be abale to concatenate later
-                img = self.preprocess_img(img)
+                img = preprocess_img(img)
 
                 label = img_and_label[:,:,0] # the red channel is the label
                 label = np.expand_dims(label, axis=-1) # to be abale to concatenate later
-                label = self.preprocess_label(label)
+                label = preprocess_label(label)
             elif filename.endswith(".json"):
                 try:
                     with open(filename, 'r') as jsn:
@@ -129,11 +134,11 @@ def generate_batch_from_files(filenames, batch_size):
 
                         img = rgb_img[:,:,1] # all channels are the same
                         img = np.expand_dims(img, axis=-1) # to be abale to concatenate later
-                        img = self.preprocess_img(img)
+                        img = preprocess_img(img)
 
                         label = get_label_from_iowa_xml_file(label_path, bscan_num_for_png)
                         label = np.expand_dims(label, axis=-1) # to be abale to concatenate later
-                        label = self.preprocess_label(label)
+                        label = preprocess_label(label)
 
                 except json.JSONDecodeError:
                     print(f"{jsn} is not a valid JSON file.")
@@ -144,16 +149,12 @@ def generate_batch_from_files(filenames, batch_size):
                 img_stack = img
                 label_stack = label
             else:
-                img_stack = np.concatenate((img_stack,img), axis=self.slice_dim)
-                label_stack = np.concatenate((label_stack,label), axis=self.slice_dim)
+                img_stack = np.concatenate((img_stack,img), axis=2)
+                label_stack = np.concatenate((label_stack,label), axis=2)
 
             filename_batch.append(filename)
-
+            
             idx += 1
-            if idx >= len(filenames):
-                idx = 0
-                np.random.shuffle(filenames) # Shuffle the filenames for the next iteration
-
         # outside "for" loop, inside "while" loop
         img_batch = img_stack
         label_batch = label_stack
@@ -164,7 +165,15 @@ def generate_batch_from_files(filenames, batch_size):
             label_batch = np.expand_dims(label_batch, axis=-1)
 
         # permute the dimension, i.e. bring channel to first position
-        yield np.transpose(img_batch, [2,0,1,3]).astype(np.float32), np.transpose(label_batch, [2,0,1,3]).astype(np.float32), filename_batch
+        yield np.transpose(img_batch, [2,0,1,3]).astype(np.float32), np.transpose(label_batch, [2,0,1,3]).astype(np.float32), np.array(filename_batch)
+
+def get_dataset(filenames, batch_size):
+    """
+    Return a dataset
+    """
+    ds = generate_batch_from_files(filenames, batch_size)
+
+    return ds
 
 def get_boundaries_from_mask(mask):
     """
@@ -209,9 +218,9 @@ if __name__ == "__main__":
     if args.input_type=='2D':
         from dataloader_2d import DatasetGenerator
         test_files = get_2d_filelist(data_path=args.data_path)
-        ds_test = get_dataset(test_files, batch_size=len(testFiles), #read all at one batch
-                              crop_dim=[args.crop_dim,args.crop_dim])
-        images, __, filenames = next(ds_test.ds) # this is one batch which currently is the whole test data
+        ds_generator = get_dataset(test_files, batch_size=len(test_files)) #read all at one batch
+        images, __, filenames = next(ds_generator)
+
     for i in range(len(images)):
         filename = os.path.basename(filenames[i])
         img = images[i]
