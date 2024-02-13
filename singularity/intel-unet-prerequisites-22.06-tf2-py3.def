@@ -1,6 +1,0 @@
-BootStrap: docker
-From: nvcr.io/nvidia/tensorflow:22.06-tf2-py3
-%post
-    pip install tqdm psutil nibabel
-    pip install visualkeras
-    pip install protobuf==3.19.0
