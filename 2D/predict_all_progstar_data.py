@@ -10,10 +10,12 @@ import os, glob
 import json
 
 
-input_all_pngs_path ='/projects/progstar/cleaning_process_oct_progstar02/OCT_imgs_files/heyex_export_raw/renamed_vol/y49/png_dirs/'
-output_all_pngs_path = '/usr/local/scratch/parisa/data/progstar/unet_predictions/'
+#input_all_pngs_path ='/projects/progstar/cleaning_process_oct_progstar02/OCT_imgs_files/heyex_export_raw/renamed_vol/y49/png_dirs/'
+#output_all_pngs_path = '/usr/local/scratch/parisa/data/progstar/unet_predictions/'
+input_all_pngs_path = '/usr/local/scratch/parisa/data/test_unet_prediction/data/'
+output_all_pngs_path = '/usr/local/scratch/parisa/data/test_unet_prediction/prediction/'
 input_type = '2D'
-saved_model_path = "/projects/parisa/git_software/intel-unet/2D/output/20231201_2d_unet_maximilian_adam_lr0001_filter16_batchsize10_epoch100_earlystop12_augmentationFalse"
+saved_model_path = "/projects/parisa/git_software/intel-unet/2D/output/20231208_2d_unet_maximilian_adam_lr0001_filter16_batchsize10_epoch100_earlystop12_augmentationFalse"
 for data_path in glob.glob(input_all_pngs_path+"1*z496_x1024"):
     print("###################################################################################")
     print(data_path.split('/')[-1])
