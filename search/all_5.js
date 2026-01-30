@@ -1,0 +1,18 @@
+var searchData=
+[
+  ['dataset_0',['dataset',['../md_2D_2README.html',1,'2D U-Net for Medical Decathlon Dataset'],['../md_3D_2README.html',1,'3D U-Net for Medical Decathlon Dataset'],['../md_README.html#autotoc_md8',1,'U-Net Biomedical Image Segmentation with Medical Decathlon Dataset.']]],
+  ['dataset_20a_20dataset_1',['Trains a 3D U-Net on the brain tumor segmentation (&lt;a href=&quot;https://www.med.upenn.edu/sbia/brats2017.html&quot; &gt;BraTS&lt;/a&gt;) subset of the &lt;a href=&quot;http://medicaldecathlon.com/&quot; &gt;Medical Segmentation Decathlon dataset&lt;/a&gt; dataset.',['../md_3D_2README.html#autotoc_md3',1,'']]],
+  ['datasetgenerator_2',['DatasetGenerator',['../classdataloader_1_1DatasetGenerator.html',1,'dataloader']]],
+  ['decathlon_20dataset_3',['decathlon dataset',['../md_2D_2README.html',1,'2D U-Net for Medical Decathlon Dataset'],['../md_3D_2README.html',1,'3D U-Net for Medical Decathlon Dataset'],['../md_README.html#autotoc_md8',1,'U-Net Biomedical Image Segmentation with Medical Decathlon Dataset.']]],
+  ['decathlon_20dataset_20a_20dataset_4',['Trains a 3D U-Net on the brain tumor segmentation (&lt;a href=&quot;https://www.med.upenn.edu/sbia/brats2017.html&quot; &gt;BraTS&lt;/a&gt;) subset of the &lt;a href=&quot;http://medicaldecathlon.com/&quot; &gt;Medical Segmentation Decathlon dataset&lt;/a&gt; dataset.',['../md_3D_2README.html#autotoc_md3',1,'']]],
+  ['decathlon_20demos_20for_20python_5',['Deep Learning Medical Decathlon Demos for Python*',['../md_README.html',1,'']]],
+  ['deep_20learning_20medical_20decathlon_20demos_20for_20python_6',['Deep Learning Medical Decathlon Demos for Python*',['../md_README.html',1,'']]],
+  ['demos_20for_20python_7',['Deep Learning Medical Decathlon Demos for Python*',['../md_README.html',1,'']]],
+  ['dice_5fcoef_8',['dice_coef',['../classmodel_1_1unet.html#a5cc6bbb6dac21f762db1283449b1b433',1,'model.unet.dice_coef()'],['../namespacemodel.html#a5a16bb6ad9a7bf3046ed8c4454e3b338',1,'model.dice_coef()'],['../classmodel__pconv_1_1unet.html#a52c60bbe277b4409c7c238476e027a3b',1,'model_pconv.unet.dice_coef(self, target, prediction, axis=(1, 2), smooth=0.0001)']]],
+  ['dice_5fcoef_5floss_9',['dice_coef_loss',['../classmodel__pconv_1_1unet.html#aa98cbae962288f1b37a936afe8901677',1,'model_pconv.unet.dice_coef_loss()'],['../classmodel_1_1unet.html#aefaadf9e792f0bdd7a996b898c0b0da8',1,'model.unet.dice_coef_loss()']]],
+  ['dice_5floss_10',['dice_loss',['../namespacemodel.html#a258973ef58761f9a9ca1b21d131d96e5',1,'model']]],
+  ['display_5ftest_5fimages_11',['display_test_images',['../classdataloader_1_1DatasetGenerator.html#a594685fb63b4354c30e3e57eb49738bb',1,'dataloader.DatasetGenerator.display_test_images(self, slice_num=90)'],['../classdataloader_1_1DatasetGenerator.html#a594685fb63b4354c30e3e57eb49738bb',1,'dataloader.DatasetGenerator.display_test_images(self, slice_num=90)']]],
+  ['display_5ftrain_5fimages_12',['display_train_images',['../classdataloader_1_1DatasetGenerator.html#ae38b04a239d7ed437b307d9ca664abd3',1,'dataloader.DatasetGenerator.display_train_images(self, slice_num=90)'],['../classdataloader_1_1DatasetGenerator.html#ae38b04a239d7ed437b307d9ca664abd3',1,'dataloader.DatasetGenerator.display_train_images(self, slice_num=90)']]],
+  ['display_5fvalidation_5fimages_13',['display_validation_images',['../classdataloader_1_1DatasetGenerator.html#a5c94698f421606200f86ec499c866ee0',1,'dataloader.DatasetGenerator.display_validation_images(self, slice_num=90)'],['../classdataloader_1_1DatasetGenerator.html#a5c94698f421606200f86ec499c866ee0',1,'dataloader.DatasetGenerator.display_validation_images(self, slice_num=90)']]],
+  ['displaying_20the_20results_14',['Displaying the Results',['../md_3D_2README.html#autotoc_md5',1,'']]]
+];

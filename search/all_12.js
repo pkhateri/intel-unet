@@ -1,0 +1,12 @@
+var searchData=
+[
+  ['test_5fintel_5ftensorflow_0',['test_intel_tensorflow',['../namespaceplot__tf__inference__examples.html#a9a095361ee6060074be1183eb4e1ba7c',1,'plot_tf_inference_examples.test_intel_tensorflow()'],['../namespacetrain.html#a3fd7687dd3113dcf5bef154e0b04843b',1,'train.test_intel_tensorflow()']]],
+  ['testing_20script_1',['Testing script',['../md_testing_2README.html',1,'']]],
+  ['the_20brain_20tumor_20segmentation_20a_20href_20https_3a_20www_20med_20upenn_20edu_20sbia_20brats2017_20html_20brats_20a_20subset_20of_20the_20a_20href_20http_3a_20medicaldecathlon_20com_20medical_20segmentation_20decathlon_20dataset_20a_20dataset_2',['Trains a 3D U-Net on the brain tumor segmentation (&lt;a href=&quot;https://www.med.upenn.edu/sbia/brats2017.html&quot; &gt;BraTS&lt;/a&gt;) subset of the &lt;a href=&quot;http://medicaldecathlon.com/&quot; &gt;Medical Segmentation Decathlon dataset&lt;/a&gt; dataset.',['../md_3D_2README.html#autotoc_md3',1,'']]],
+  ['the_20results_3',['Displaying the Results',['../md_3D_2README.html#autotoc_md5',1,'']]],
+  ['to_20train_20a_20new_20model_3a_4',['Steps to train a new model:',['../md_3D_2README.html#autotoc_md4',1,'']]],
+  ['train_5',['train',['../namespacetrain.html',1,'']]],
+  ['train_20a_20new_20model_3a_6',['Steps to train a new model:',['../md_3D_2README.html#autotoc_md4',1,'']]],
+  ['trains_20a_203d_20u_20net_20on_20the_20brain_20tumor_20segmentation_20a_20href_20https_3a_20www_20med_20upenn_20edu_20sbia_20brats2017_20html_20brats_20a_20subset_20of_20the_20a_20href_20http_3a_20medicaldecathlon_20com_20medical_20segmentation_20decathlon_20dataset_20a_20dataset_7',['Trains a 3D U-Net on the brain tumor segmentation (&lt;a href=&quot;https://www.med.upenn.edu/sbia/brats2017.html&quot; &gt;BraTS&lt;/a&gt;) subset of the &lt;a href=&quot;http://medicaldecathlon.com/&quot; &gt;Medical Segmentation Decathlon dataset&lt;/a&gt; dataset.',['../md_3D_2README.html#autotoc_md3',1,'']]],
+  ['tumor_20segmentation_20a_20href_20https_3a_20www_20med_20upenn_20edu_20sbia_20brats2017_20html_20brats_20a_20subset_20of_20the_20a_20href_20http_3a_20medicaldecathlon_20com_20medical_20segmentation_20decathlon_20dataset_20a_20dataset_8',['Trains a 3D U-Net on the brain tumor segmentation (&lt;a href=&quot;https://www.med.upenn.edu/sbia/brats2017.html&quot; &gt;BraTS&lt;/a&gt;) subset of the &lt;a href=&quot;http://medicaldecathlon.com/&quot; &gt;Medical Segmentation Decathlon dataset&lt;/a&gt; dataset.',['../md_3D_2README.html#autotoc_md3',1,'']]]
+];
