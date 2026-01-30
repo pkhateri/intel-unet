@@ -3,6 +3,8 @@
 2D/inference_examples/*
 2D/inference_examples_openvino/*
 
+# Documentation
+docs/html/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
